@@ -1,0 +1,17 @@
+[project]
+name = "camilo-sa-rodriguez"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "camilosanchezrodriguez60-commits", email = "camilosanchezrodriguez60@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+camilo-sa-rodriguez = "camilo_sa_rodriguez:main"
+
+[build-system]
+requires = ["uv_build>=0.12.18,<0.13.0"]
+build-backend = "uv_build"
