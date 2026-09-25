@@ -1,0 +1,16 @@
+### C1. Descarga por herencia  Falta llamar al constructor de la clase padre con super()._init_().
+
+
+import threading
+
+
+class Descarga(threading.Thread):
+    def __init__(self, archivo): 
+        super().__init__()
+        self.archivo = archivo
+
+    def run(self):
+        print("descargando", self.archivo)
+
+
+Descarga("a.zip").start()
