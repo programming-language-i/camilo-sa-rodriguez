@@ -31,8 +31,8 @@ TIEMPO_LECTURA = 0.3
 class Sensor(threading.Thread):
 
     # TODO 1
-    def _init_(self, nombre, cantidad, base):
-        super()._init_()
+    def __init__(self, nombre, cantidad, base):
+        super().__init__()
         self.nombre = nombre
         self.cantidad = cantidad
         self.base = base
