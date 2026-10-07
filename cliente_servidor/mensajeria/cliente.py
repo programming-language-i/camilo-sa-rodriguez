@@ -4,97 +4,44 @@ import threading
 HOST = "127.0.0.1"
 PORT = 8080
 
-clientes = []
-lock = threading.Lock()
+nombre = input("Ingresa tu nombre: ")
+
+cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+cliente.connect((HOST, PORT))
 
 
-def enviar_mensaje(mensaje, cliente_actual):
-    print("Función de envío de mensajería")
-
-    with lock:
-        for cliente in clientes[:]:
-            if cliente != cliente_actual:
-                try:
-                    cliente.send(mensaje.encode("utf-8"))
-                except OSError:
-                    print(f"Error al enviar mensaje a {cliente.getpeername()}")
-                    clientes.remove(cliente)
-
-
-def atender_cliente(cliente_socket, direccion):
-    print(f"Cliente conectado: {direccion}")
-
-    with lock:
-        clientes.append(cliente_socket)
-import socket
-import threading
-
-HOST = "127.0.0.1"
-PORT = 8080
-
-clientes = []
-lock = threading.Lock()
-
-
-def enviar_mensaje(mensaje, cliente_actual):
-    print("Función de envío de mensajería")
-
-    with lock:
-        for cliente in clientes[:]:
-            if cliente != cliente_actual:
-                try:
-                    cliente.send(mensaje.encode("utf-8"))
-                except OSError:
-                    print(f"Error al enviar mensaje a {cliente.getpeername()}")
-                    clientes.remove(cliente)
-
-
-def atender_cliente(cliente_socket, direccion):
-    print(f"Cliente conectado: {direccion}")
-
-    with lock:
-        clientes.append(cliente_socket)
-
-    try:
-        while True:
-            mensaje = cliente_socket.recv(1024)
+def recibir_mensajes():
+    while True:
+        try:
+            mensaje = cliente.recv(1024)
 
             if not mensaje:
                 break
 
-            mensaje = mensaje.decode("utf-8")
+            print("\n" + mensaje.decode("utf-8"))
 
-            print(f"{direccion}: {mensaje}")
-
-            enviar_mensaje(
-                f"{direccion}: {mensaje}",
-                cliente_socket
-            )
-
-    except OSError as e:
-        print(f"Error con el cliente {direccion}: {e}")
-
-    finally:
-        with lock:
-            if cliente_socket in clientes:
-                clientes.remove(cliente_socket)
-
-        cliente_socket.close()
-        print(f"Cliente desconectado: {direccion}")
+        except OSError:
+            break
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
-    servidor.bind((HOST, PORT))
-    servidor.listen()
+hilo = threading.Thread(target=recibir_mensajes)
+hilo.daemon = True
+hilo.start()
 
-    print(f"Servidor escuchando en {HOST}:{PORT}")
 
-    while True:
-        cliente_socket, direccion = servidor.accept()
+print(f"Conectado como {nombre}")
+print("Escribe tus mensajes. Escribe 'salir' para desconectarte.")
 
-        hilo = threading.Thread(
-            target=atender_cliente,
-            args=(cliente_socket, direccion)
-        )
+while True:
+    mensaje = input()
 
-        hilo.start()
+    if mensaje.lower() == "salir":
+        break
+
+    mensaje_completo = f"{nombre}: {mensaje}"
+
+    try:
+        cliente.sendall(mensaje_completo.encode("utf-8"))
+    except OSError:
+        print("No se pudo enviar el mensaje.")
+        break
